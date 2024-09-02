@@ -1,0 +1,30 @@
+apiVersion: skaffold/v2alpha3
+kind: Config
+build:
+  insecureRegistries:
+    - 192.168.1.196:32000 
+  local:
+    push: true
+  artifacts:
+  - image: 192.168.1.196:32000/next-learn/frontend
+    context: frontend
+    docker:
+      dockerfile: Dockerfile
+      target: dev
+    sync:
+      manual:
+        - src: 'app/**/*.ts'
+          dest: .      
+deploy:
+  kubectl:
+    manifests:
+      - ./infra/k8s/*
+profiles:
+  - name: production
+    build:
+      artifacts:
+        - image: 192.168.1.196:32000/next-learn/frontend
+          context: frontend
+          docker:
+            dockerfile: Dockerfile
+            target: production
